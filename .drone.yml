@@ -11,6 +11,8 @@ trigger:
     - cron
     - tag
     - push
+  cron:
+    - hourly
 
 platform:
   os: linux
