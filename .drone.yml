@@ -5,8 +5,11 @@ name: alpine
 
 trigger:
   ref:
-  - refs/heads/master
-  - refs/pull/*/head
+    - refs/heads/master
+    - refs/pull/*/head
+  event:
+    - cron
+    - tag
 
 platform:
   os: linux
@@ -27,4 +30,7 @@ steps:
       to: 205514323
     when:
       status: [ success, failure ]
+      event:
+        - cron
+        - tag
     depends_on: ['Build']
