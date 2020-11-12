@@ -17,6 +17,8 @@ steps:
     image: alpine:edge
     commands:
       - echo "Hello world"
+      - ls
+      - exit 0
   - name: Notify
     image: appleboy/drone-telegram
     settings:
