@@ -8,12 +8,6 @@ trigger:
     - refs/heads/master
     - refs/pull/*/head
     - refs/tags/*
-  event:
-    - cron
-    - tag
-    - push
-  cron:
-    - hourly
 
 platform:
   os: linux
