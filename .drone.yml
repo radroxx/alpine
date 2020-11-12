@@ -3,6 +3,11 @@ kind: pipeline
 type: docker
 name: alpine
 
+trigger:
+  ref:
+  - refs/heads/master
+  - refs/pull/*/head
+
 platform:
   os: linux
   arch: amd64
@@ -12,10 +17,6 @@ steps:
     image: alpine:edge
     commands:
       - echo "Hello world"
-    when:
-      ref:
-      - refs/heads/master
-      - refs/pull/*/head
   - name: Notify
     image: appleboy/drone-telegram
     settings:
