@@ -14,13 +14,13 @@ platform:
   arch: amd64
 
 steps:
-  - name: Build
+  - name: build
     image: alpine:edge
     commands:
       - echo "Hello world"
       - ls
       - exit 0
-  - name: Notify
+  - name: notify
     image: appleboy/drone-telegram
     settings:
       token:
@@ -29,6 +29,5 @@ steps:
     when:
       status: [ success, failure ]
       event:
-        - cron
         - tag
-    depends_on: ['Build']
+    depends_on: ['build']
