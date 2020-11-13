@@ -18,16 +18,15 @@ steps:
     image: alpine:edge
     commands:
       - mkdir dist
-      - date > dist/echo.txt
-      - echo "Hello world" >> dist/echo.txt
-      - pwd
+      - date > dist/echo.img
+      - echo "Hello world" >> dist/echo.img
 
   - name: publish
     image: plugins/github-release
     settings:
       api_key:
         from_secret: github_token
-    files: /drone/src/dist/*
+    files: dist/*
     checksum:
       - md5
       - sha1
