@@ -17,29 +17,21 @@ steps:
   - name: build
     image: alpine:edge
     commands:
-      - ls
-      - echo "Hello world" > echo.txt
-      - ls
-      - exit 0
-  
-  - name: list
-    image: alpine:edge
-    commands:
-      - ls
-    depends_on: ['build']
-   
+      - date > echo.txt
+      - echo "Hello world" >> echo.txt
+
   - name: publish
     image: plugins/github-release
     settings:
       api_key:
         from_secret: github_token
-    files: /tmp/alpinebuildcache/boot/*
+    files: echo.txt
     checksum:
       - md5
       - sha1
     when:
       event: [tag]
-    depends_on: ['list']
+    depends_on: ['build']
   
   - name: notify
     image: appleboy/drone-telegram
