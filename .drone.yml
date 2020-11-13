@@ -20,6 +20,7 @@ steps:
       - mkdir dist
       - date > dist/echo.txt
       - echo "Hello world" >> dist/echo.txt
+      - pwd
 
   - name: publish
     image: plugins/github-release
