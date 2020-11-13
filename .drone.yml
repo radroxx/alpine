@@ -27,7 +27,7 @@ steps:
     settings:
       api_key:
         from_secret: github_token
-    files: dist/*
+    files: /drone/src/dist/*
     checksum:
       - md5
       - sha1
