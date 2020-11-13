@@ -26,10 +26,10 @@ steps:
     settings:
       api_key:
         from_secret: github_token
-    files: dist/*
-    checksum:
-      - md5
-      - sha1
+      files: dist/*
+      checksum:
+        - md5
+        - sha1
     when:
       event: [tag]
     depends_on: ['build']
