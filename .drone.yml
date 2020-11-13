@@ -17,15 +17,16 @@ steps:
   - name: build
     image: alpine:edge
     commands:
-      - date > echo.txt
-      - echo "Hello world" >> echo.txt
+      - mkdir dist
+      - date > dist/echo.txt
+      - echo "Hello world" >> dist/echo.txt
 
   - name: publish
     image: plugins/github-release
     settings:
       api_key:
         from_secret: github_token
-    files: echo.txt
+    files: dist/*
     checksum:
       - md5
       - sha1
