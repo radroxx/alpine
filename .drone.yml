@@ -3,23 +3,74 @@ kind: pipeline
 type: docker
 name: alpine
 
+platform:
+  os: linux
+  arch: amd64
+
 trigger:
   ref:
     - refs/heads/master
     - refs/pull/*/head
     - refs/tags/*
 
-platform:
-  os: linux
-  arch: amd64
+services:
+  - name: cache
+    image: alpine
+    commands:
+        - apk add squid
+        - echo "cache_dir aufs /var/cache/squid 20000 16 256" >> /etc/squid/squid.conf
+        - echo "maximum_object_size 1024 MB" >> /etc/squid/squid.conf
+        - squid -z -N
+        - squid -N
 
 steps:
-  - name: build
-    image: alpine:edge
+  - name: wait cache
+    image: alpine
+    environment:
+      http_proxy: http://cache:3128
     commands:
-      - mkdir dist
-      - date > dist/echo.img
-      - echo "Hello world" >> dist/echo.img
+        - sh wait_proxy.sh
+
+  - name: build custom pkg
+    image: alpine
+    environment:
+      http_proxy: http://cache:3128
+    commands:
+      - apk add abuild
+      - abuild-keygen -n -i -a
+      - cd alpine-custom
+      - abuild -c -k -F -r
+      - cp /root/packages/src/x86_64/alpine-custom-*.apk ./
+      - cp /root/.abuild/*.pub ./
+    depends_on: ['wait cache']
+
+  - name: build image lts
+    image: alpine
+    environment:
+      http_proxy: http://cache:3128
+    commands:
+      - cp alpine-custom/*.pub /etc/apk/keys/
+      - apk add alpine-custom/alpine-custom-*.apk
+      #linux-lts
+      - ls /boot/
+    depends_on: ['build custom pkg']
+
+  - name: build image virt
+    image: alpine
+    environment:
+      http_proxy: http://cache:3128
+    commands:
+      - cp alpine-custom/*.pub /etc/apk/keys/
+      - apk add alpine-custom/alpine-custom-*.apk
+      #linux-virt
+    depends_on: ['build custom pkg']
+  
+  - name: clean
+    image: alpine
+    commands:
+      - rm alpine-custom/*.pub
+      - rm alpine-custom/*.apk
+    depends_on: ['build image lts', 'build image virt']
 
   - name: publish
     image: plugins/github-release
@@ -32,7 +83,7 @@ steps:
         - sha1
     when:
       event: [tag]
-    depends_on: ['build']
+    depends_on: ['clean']
   
   - name: notify
     image: appleboy/drone-telegram
