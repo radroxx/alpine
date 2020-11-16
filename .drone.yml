@@ -44,6 +44,19 @@ steps:
       - cp /root/.abuild/*.pub ./
     depends_on: ['wait cache']
 
+  - name: build image virt
+    image: alpine
+    environment:
+      http_proxy: http://cache:3128
+      kernel_type: virt
+    commands:
+      - cp alpine-custom/*.pub /etc/apk/keys/
+      - mkdir alpine-${kernel_type}
+      - apk add --root alpine-${kernel_type} --progress --initramfs-diskless-boot alpine-custom/alpine-custom-*.apk
+      - apk add --root alpine-${kernel_type} --progress --initramfs-diskless-boot --no-scripts linux-${kernel_type} wireguard-${kernel_type}
+      - ls -lha alpine-${kernel_type}/
+    depends_on: ['build custom pkg']
+
   - name: build image lts
     image: alpine
     environment:
@@ -52,17 +65,6 @@ steps:
       - cp alpine-custom/*.pub /etc/apk/keys/
       - apk add alpine-custom/alpine-custom-*.apk
       #linux-lts
-      - ls /boot/
-    depends_on: ['build custom pkg']
-
-  - name: build image virt
-    image: alpine
-    environment:
-      http_proxy: http://cache:3128
-    commands:
-      - cp alpine-custom/*.pub /etc/apk/keys/
-      - apk add alpine-custom/alpine-custom-*.apk
-      #linux-virt
     depends_on: ['build custom pkg']
   
   - name: clean
