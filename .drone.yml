@@ -51,8 +51,9 @@ steps:
     commands:
       - cp alpine-custom/*.pub /etc/apk/keys/
       - mkdir alpine-virt
-      - apk add --root alpine-virt --progress --initramfs-diskless-boot alpine-custom/alpine-custom-*.apk
-      - apk add --root alpine-virt --progress --initramfs-diskless-boot --no-scripts linux-virt wireguard-virt
+      - apk add --root alpine-virt --repositories-file /etc/apk/repositories --keys-dir /etc/apk/keys --progress --initramfs-diskless-boot alpine-base
+      #- apk add --root alpine-virt --progress --initramfs-diskless-boot alpine-custom/alpine-custom-*.apk
+      #- apk add --root alpine-virt --progress --initramfs-diskless-boot --no-scripts linux-virt wireguard-virt
       - ls -lha alpine-virt/
     depends_on: ['build custom pkg']
 
