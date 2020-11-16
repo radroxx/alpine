@@ -51,8 +51,8 @@ steps:
     commands:
       - cp alpine-custom/*.pub /etc/apk/keys/
       - mkdir alpine-virt
-      - apk add --root alpine-virt --repositories-file /etc/apk/repositories --keys-dir /etc/apk/keys --progress --initramfs-diskless-boot alpine-custom/alpine-custom*.apk
-      - apk add --root alpine-virt --repositories-file /etc/apk/repositories --keys-dir /etc/apk/keys --progress --initramfs-diskless-boot --no-scripts linux-virt wireguard-virt
+      - apk add --root alpine-virt --repositories-file /etc/apk/repositories --keys-dir /etc/apk/keys --initramfs-diskless-boot alpine-custom/alpine-custom*.apk
+      - apk add --root alpine-virt --repositories-file /etc/apk/repositories --keys-dir /etc/apk/keys --initramfs-diskless-boot --no-scripts linux-virt wireguard-virt
     depends_on: ['build custom pkg']
 
   - name: build image lts
@@ -62,8 +62,8 @@ steps:
     commands:
       - cp alpine-custom/*.pub /etc/apk/keys/
       - mkdir alpine-lts
-      - apk add --root alpine-lts --repositories-file /etc/apk/repositories --keys-dir /etc/apk/keys --progress --initramfs-diskless-boot alpine-custom/alpine-custom*.apk
-      - apk add --root alpine-lts --repositories-file /etc/apk/repositories --keys-dir /etc/apk/keys --progress --initramfs-diskless-boot --no-scripts linux-lts wireguard-lts
+      - apk add --root alpine-lts --repositories-file /etc/apk/repositories --keys-dir /etc/apk/keys --initramfs-diskless-boot alpine-custom/alpine-custom*.apk
+      - apk add --root alpine-lts --repositories-file /etc/apk/repositories --keys-dir /etc/apk/keys --initramfs-diskless-boot --no-scripts linux-lts wireguard-lts
     depends_on: ['build custom pkg']
   
   - name: clean
