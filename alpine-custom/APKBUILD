@@ -31,6 +31,9 @@ depends="${depends} dropbear dropbear-scp dropbear-openrc"
 # Docker
 depends="${depends} docker docker-openrc" 
 
+# utils
+depends="${depends} rsync"
+
 build() {
 	return 0
 }

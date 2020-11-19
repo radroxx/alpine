@@ -67,6 +67,9 @@ steps:
     commands:
       - mkdir -p dist/
       - cp alpine-virt/boot/vmlinuz-virt dist/vmlinuz-virt
+      - apk add --initramfs-diskless-boot --no-scripts squashfs-tools linux-virt
+      - mksquashfs alpine-virt/ /media/sysroot.squashfs -comp gzip -b 1M -no-xattrs -always-use-fragments -noappend -no-recovery -processors 1 -mem 1024M -no-progress -wildcards -ef exclude.txt
+      - ./mkinitrd.sh
     depends_on: ['build image virt']
 
   - name: build image lts
@@ -92,6 +95,9 @@ steps:
     commands:
       - mkdir -p dist/
       - cp alpine-lts/boot/vmlinuz-lts dist/vmlinuz-lts
+      - apk add --initramfs-diskless-boot --no-scripts squashfs-tools linux-lts
+      - mksquashfs alpine-lts/ /media/sysroot.squashfs -comp gzip -b 1M -no-xattrs -always-use-fragments -noappend -no-recovery -processors 1 -mem 1024M -no-progress -wildcards -ef exclude.txt
+      - ./mkinitrd.sh
     depends_on: ['build image lts']
 
   - name: clean
@@ -99,8 +105,8 @@ steps:
     commands:
       - rm -Rf alpine-custom/*.pub
       - rm -Rf alpine-custom/*.apk
-      #- rm -Rf alpine-virt
-      #- rm -Rf alpine-lts
+      - rm -Rf alpine-virt
+      - rm -Rf alpine-lts
     depends_on: ['create image lts', 'create image virt']
 
   - name: publish
