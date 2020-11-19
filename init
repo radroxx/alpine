@@ -1,0 +1,120 @@
+#!/bin/sh
+
+/bin/busybox mkdir -p /proc /sys /dev /usr/bin /usr/sbin /sbin /sysroot /media
+/bin/busybox --install -s
+
+export PATH=/usr/bin:/bin:/usr/sbin:/sbin
+
+mount -t proc -o noexec,nosuid,nodev proc /proc
+mount -t sysfs -o noexec,nosuid,nodev sysfs /sys
+mount -n -t devtmpfs -o exec,nosuid,mode=0755,size=10M dev /dev
+
+# needed devs
+[ -c /dev/null ] || mknod -m 666 /dev/null c 1 3
+
+# Recursively resolve tty aliases like console or tty0
+list_console_devices() {
+	if ! [ -e /sys/class/tty/$1/active ]; then
+		echo $1
+		return
+	fi
+
+	for dev in $(cat /sys/class/tty/$1/active); do
+		list_console_devices $dev
+	done
+}
+
+setup_inittab_console(){
+	term=vt100
+	# Inquire the kernel for list of console= devices
+	for tty in $(list_console_devices console); do
+		# do nothing if inittab already have the tty set up
+		if ! grep -q "^$tty:" /sysroot/etc/inittab; then
+			echo "# enable login on alternative console" \
+				>> /sysroot/etc/inittab
+			# Baudrate of 0 keeps settings from kernel
+			echo "$tty::respawn:/sbin/getty -L 0 $tty $term" \
+				>> /sysroot/etc/inittab
+		fi
+		if [ -e /sysroot/etc/securetty ] && ! grep -q -w "$tty" /sysroot/etc/securetty; then
+			echo "$tty" >> /sysroot/etc/securetty
+		fi
+	done
+}
+
+rtc_exists() {
+	local rtc=
+	for rtc in /dev/rtc /dev/rtc[0-9]*; do
+		[ -e "$rtc" ] && break
+	done
+	[ -e "$rtc" ]
+}
+
+# read the kernel options. we need surve things like:
+#  acpi_osi="!Windows 2006" xen-pciback.hide=(01:00.0)
+set -- $(cat /proc/cmdline)
+
+myopts="debug_init init_args pkgs ssh_key autodetect"
+for opt; do
+	case "$opt" in
+	s|single|1)
+		SINGLEMODE=yes
+		continue
+		;;
+	esac
+
+	for i in $myopts; do
+		case "$opt" in
+		$i=*)	eval "KOPT_${i}=${opt#*=}";;
+		$i)	eval "KOPT_${i}=yes";;
+		no$i)	eval "KOPT_${i}=no";;
+		esac
+	done
+done
+
+# enable debugging if requested
+[ -n "$KOPT_debug_init" ] && set -x
+
+# load available drivers to get access to modloop media
+# early console?
+if [ "$SINGLEMODE" = "yes" ]; then
+	echo "Entering single mode. Type 'exit' to continue booting."
+	sh
+fi
+
+# Mount rootfs
+modprobe loop
+modprobe squashfs
+modprobe overlay
+
+mkdir -p /media/root-ro /media/root-rw
+mount -t tmpfs -o mode=0755 tmpfs /media/root-rw
+mkdir -p /media/root-rw/upper /media/root-rw/work
+cp /media/sysroot.squashfs /media/root-rw/sysroot.squashfs
+mount -t squashfs -o ro /media/root-rw/sysroot.squashfs /media/root-ro
+mount -t overlay  -o lowerdir=/media/root-ro,upperdir=/media/root-rw/upper,workdir=/media/root-rw/work overlayfs /sysroot
+
+# use swclock if no RTC is found
+if rtc_exists; then
+	ln -sf /etc/init.d/hwclock /sysroot/etc/runlevels/boot/hwclock
+else
+	ln -sf /etc/init.d/swclock /sysroot/etc/runlevels/boot/swclock
+fi
+
+setup_inittab_console
+
+mkdir -p /sysroot/sys /sysroot/proc /sysroot/dev /sysroot/media/root-rw /sysroot/run /sysroot/var/cache/apk
+
+# rsync -a -r -v /patch/* /sysroot
+
+mount -o bind /media/root-rw /sysroot/media/root-rw
+mount -o bind /sys /sysroot/sys
+mount -o bind /proc /sysroot/proc
+mount -o bind /dev /sysroot/dev
+
+exec /bin/busybox switch_root /sysroot /sbin/init $KOPT_init_args
+
+echo "initramfs emergency recovery shell launched"
+exec /bin/busybox sh
+
+reboot

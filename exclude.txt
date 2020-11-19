@@ -1,0 +1,13 @@
+boot
+dev
+proc
+home
+run
+sys
+tmp
+srv
+opt
+var
+media/*
+usr/bin/docker
+usr/bin/ctr
