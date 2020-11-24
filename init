@@ -89,10 +89,10 @@ modprobe overlay
 
 mkdir -p /media/root-ro /media/root-rw
 mount -t tmpfs -o mode=0755 tmpfs /media/root-rw
-mkdir -p /media/root-rw/upper /media/root-rw/work
+mkdir -p /media/root-rw/upper /media/root-rw/metadata
 cp /media/sysroot.squashfs /media/root-rw/sysroot.squashfs
 mount -t squashfs -o ro /media/root-rw/sysroot.squashfs /media/root-ro
-mount -t overlay  -o lowerdir=/media/root-ro,upperdir=/media/root-rw/upper,workdir=/media/root-rw/work overlayfs /sysroot
+mount -t overlay  -o lowerdir=/media/root-ro,upperdir=/media/root-rw/upper,workdir=/media/root-rw/metadata overlayfs /sysroot
 
 # use swclock if no RTC is found
 if rtc_exists; then
@@ -105,13 +105,16 @@ setup_inittab_console
 
 mkdir -p /sysroot/sys /sysroot/proc /sysroot/dev /sysroot/media/root-rw /sysroot/run /sysroot/var/cache/apk
 
-# rsync -a -r -v /patch/* /sysroot
+find / -xdev -type f -name '*patch*.tar' -exec tar -xf {} -C /sysroot \;
 
 mount -o bind /media/root-rw /sysroot/media/root-rw
 mount -o bind /sys /sysroot/sys
 mount -o bind /proc /sysroot/proc
 mount -o bind /dev /sysroot/dev
 
+if [ -f /preboot ]; then
+	cat /preboot | chroot /sysroot/ /bin/sh
+fi
 exec /bin/busybox switch_root /sysroot /sbin/init $KOPT_init_args
 
 echo "initramfs emergency recovery shell launched"
