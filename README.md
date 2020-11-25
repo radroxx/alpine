@@ -39,5 +39,9 @@ echo "echo 'root:${SECRET_PASSWORD}' | chpasswd -e"
 
 ### How to boot in qemu
 ```sh
-qemu-system-x86_64 -m 512M -serial stdio -append "console=ttyS0" -kernel vmlinuz-virt -initrd my_custom_initrd
+qemu-system-x86_64 -m 512M -nographic -append "console=ttyS0" -kernel vmlinuz-virt -initrd my_custom_initrd
+```
+### How to exit from qemu
+```sh
+poweroff
 ```
