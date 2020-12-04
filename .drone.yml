@@ -58,7 +58,7 @@ steps:
       - ln -s $(ls -1 alpine-virt/lib/modules/ | head -n1 | tr -d "\r\n") alpine-virt/lib/modules/$(uname -r)
       - depmod -a -b alpine-virt
       - rm alpine-virt/lib/modules/$(uname -r)
-      - wget -q -O remco.zip https://github.com/HeavyHorst/remco/releases/download/v0.12.1/remco_0.12.1_linux_amd64.zip
+      - wget -q -Y off -O remco.zip https://github.com/HeavyHorst/remco/releases/download/v0.12.1/remco_0.12.1_linux_amd64.zip
       - unzip remco.zip -d alpine-virt/bin/
     depends_on: ['build custom pkg']
   
@@ -88,7 +88,7 @@ steps:
       - ln -s $(ls -1 alpine-lts/lib/modules/ | head -n1 | tr -d "\r\n") alpine-lts/lib/modules/$(uname -r)
       - depmod -a -b alpine-lts
       - rm alpine-lts/lib/modules/$(uname -r)
-      - wget -q -O remco.zip https://github.com/HeavyHorst/remco/releases/download/v0.12.1/remco_0.12.1_linux_amd64.zip
+      - wget -q -Y off -O remco.zip https://github.com/HeavyHorst/remco/releases/download/v0.12.1/remco_0.12.1_linux_amd64.zip
       - unzip remco.zip -d alpine-lts/bin/
     depends_on: ['build custom pkg']
   
