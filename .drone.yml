@@ -59,7 +59,7 @@ steps:
       - depmod -a -b alpine-virt
       - rm alpine-virt/lib/modules/$(uname -r)
       - wget -q -Y off -O remco.zip https://github.com/HeavyHorst/remco/releases/download/v0.12.1/remco_0.12.1_linux_amd64.zip
-      - unzip remco.zip -d alpine-virt/bin/
+      - unzip remco.zip -d alpine-virt/usr/bin/
     depends_on: ['build custom pkg']
   
   - name: create image virt
@@ -89,7 +89,7 @@ steps:
       - depmod -a -b alpine-lts
       - rm alpine-lts/lib/modules/$(uname -r)
       - wget -q -Y off -O remco.zip https://github.com/HeavyHorst/remco/releases/download/v0.12.1/remco_0.12.1_linux_amd64.zip
-      - unzip remco.zip -d alpine-lts/bin/
+      - unzip remco.zip -d alpine-lts/usr/bin/
     depends_on: ['build custom pkg']
   
   - name: create image lts
@@ -111,6 +111,7 @@ steps:
       - rm -Rf alpine-custom/*.apk
       - rm -Rf alpine-virt
       - rm -Rf alpine-lts
+      - rm -Rf remco.zip
     depends_on: ['create image lts', 'create image virt']
 
   - name: publish
