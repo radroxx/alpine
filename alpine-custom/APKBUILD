@@ -32,7 +32,7 @@ depends="${depends} dropbear dropbear-scp dropbear-openrc"
 depends="${depends} docker docker-openrc" 
 
 # utils
-depends="${depends} rsync docker-py"
+depends="${depends} rsync docker-py dnsmasq"
 
 build() {
 	return 0
