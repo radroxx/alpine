@@ -88,10 +88,9 @@ modprobe squashfs
 modprobe overlay
 
 mkdir -p /media/root-ro /media/root-rw
-mount -t tmpfs -o mode=0755 tmpfs /media/root-rw
+mount -t tmpfs -o mode=0755,size=100% tmpfs /media/root-rw
 mkdir -p /media/root-rw/upper /media/root-rw/metadata
-cp /media/sysroot.squashfs /media/root-rw/sysroot.squashfs
-mount -t squashfs -o ro /media/root-rw/sysroot.squashfs /media/root-ro
+mount -t squashfs -o ro /media/sysroot.squashfs /media/root-ro
 mount -t overlay  -o lowerdir=/media/root-ro,upperdir=/media/root-rw/upper,workdir=/media/root-rw/metadata overlayfs /sysroot
 
 # use swclock if no RTC is found
