@@ -9,4 +9,3 @@ srv
 opt
 var
 media/*
-usr/bin/ctr
