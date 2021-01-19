@@ -9,5 +9,3 @@ srv
 opt
 var
 media/*
-usr/bin/docker
-usr/bin/ctr
