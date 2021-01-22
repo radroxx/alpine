@@ -1,7 +1,7 @@
 # Contributor: Radroxxx <radroxxx@gmail.com>
 # Maintainer: Radroxxx <radroxxx@gmail.com>
 pkgname=alpine-custom
-pkgver=0.0.8
+pkgver=0.1.0
 pkgrel=0
 pkgdesc="Meta package for minimal alpine + docker in ram"
 url="https://alpinelinux.org"
@@ -17,10 +17,10 @@ source=""
 depends="alpine-base"
 
 # Файловая подсистема
-depends="${depends} btrfs-progs e2fsprogs cryptsetup cryptsetup-openrc"
+depends="${depends} btrfs-progs e2fsprogs cryptsetup cryptsetup-openrc samba ntfs-3g"
 
 # Сетевая подсистема
-depends="${depends} dhclient ip6tables ipset curl rsync wireguard-tools openvpn"
+depends="${depends} dhclient ip6tables ipset curl rsync wireguard-tools openvpn lsyncd-openrc lsyncd"
 
 # Wifi
 depends="${depends} wireless-tools wpa_supplicant hostapd"
@@ -32,10 +32,10 @@ depends="${depends} dropbear dropbear-scp dropbear-openrc"
 depends="${depends} containerd device-mapper-libs tini-static"
 
 # utils
-depends="${depends} docker-py dnsmasq supervisor gnupg sudo pv minicom socat unzip tmux borgbackup"
+depends="${depends} dropbear-ssh docker-py dnsmasq supervisor gnupg sudo pv mc minicom socat unzip p7zip tmux borgbackup git mailx sqlite"
 
 # loging
-depends="${depends} rsyslog-openrc rsyslog rsyslog-relp logrotate-openrc logrotate fail2ban-openrc fail2ban"
+depends="${depends} rsyslog-openrc rsyslog rsyslog-relp logrotate fail2ban-openrc fail2ban"
 
 # diagnostic
 depends="${depends} htop atop iftop mtr iperf3 tcpdump ddrescue"
