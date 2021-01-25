@@ -13,101 +13,24 @@ trigger:
     - refs/pull/*/head
     - refs/tags/*
 
-services:
-  - name: cache
-    image: alpine
-    commands:
-        - apk add squid
-        - echo "cache_dir aufs /var/cache/squid 20000 16 256" >> /etc/squid/squid.conf
-        - echo "maximum_object_size 1024 MB" >> /etc/squid/squid.conf
-        - squid -z -N
-        - squid -N
-
 steps:
-  - name: wait cache
-    image: alpine
-    environment:
-      http_proxy: http://cache:3128
-    commands:
-        - sh wait_proxy.sh
-
-  - name: build custom pkg
-    image: alpine
-    environment:
-      http_proxy: http://cache:3128
-    commands:
-      - apk add abuild
-      - abuild-keygen -n -i -a
-      - cd alpine-custom
-      - abuild -c -k -F -r
-      - cp /root/packages/src/x86_64/alpine-custom-*.apk ./
-      - cp /root/.abuild/*.pub ./
-    depends_on: ['wait cache']
-
-  - name: build image virt
-    image: alpine
-    environment:
-      http_proxy: http://cache:3128
-    commands:
-      - cp alpine-custom/*.pub /etc/apk/keys/
-      - mkdir -p alpine-virt/etc/apk
-      - cp /etc/apk/repositories alpine-virt/etc/apk/repositories
-      - apk add --root alpine-virt --keys-dir /etc/apk/keys --initramfs-diskless-boot alpine-custom/alpine-custom*.apk
-      - apk add --root alpine-virt --keys-dir /etc/apk/keys --initramfs-diskless-boot --no-scripts linux-virt
-      - chmod +rw alpine-virt/bin/bbsuid
-      - ln -s $(ls -1 alpine-virt/lib/modules/ | head -n1 | tr -d "\r\n") alpine-virt/lib/modules/$(uname -r)
-      - depmod -a -b alpine-virt
-      - rm alpine-virt/lib/modules/$(uname -r)
-    depends_on: ['build custom pkg']
-  
   - name: create image virt
     image: alpine
-    environment:
-      http_proxy: http://cache:3128
     commands:
-      - mkdir -p dist/
-      - cp alpine-virt/boot/vmlinuz-virt dist/vmlinuz-virt
-      - apk add --initramfs-diskless-boot --no-scripts squashfs-tools linux-virt
-      - mksquashfs alpine-virt/ /media/sysroot.squashfs -comp gzip -b 1M -no-xattrs -always-use-fragments -noappend -no-recovery -processors 1 -mem 1024M -no-progress -wildcards -ef exclude.txt
-      - ./mkinitrd.sh
-    depends_on: ['build image virt']
-
-  - name: build image lts
-    image: alpine
-    environment:
-      http_proxy: http://cache:3128
-    commands:
-      - cp alpine-custom/*.pub /etc/apk/keys/
-      - mkdir -p alpine-lts/etc/apk
-      - cp /etc/apk/repositories alpine-lts/etc/apk/repositories
-      - apk add --root alpine-lts --keys-dir /etc/apk/keys --initramfs-diskless-boot alpine-custom/alpine-custom*.apk
-      - apk add --root alpine-lts --keys-dir /etc/apk/keys --initramfs-diskless-boot --no-scripts linux-lts
-      - chmod +rw alpine-lts/bin/bbsuid
-      - ln -s $(ls -1 alpine-lts/lib/modules/ | head -n1 | tr -d "\r\n") alpine-lts/lib/modules/$(uname -r)
-      - depmod -a -b alpine-lts
-      - rm alpine-lts/lib/modules/$(uname -r)
-    depends_on: ['build custom pkg']
+      - apk add make squashfs-tools
+      - make virt
   
   - name: create image lts
     image: alpine
-    environment:
-      http_proxy: http://cache:3128
     commands:
-      - mkdir -p dist/
-      - cp alpine-lts/boot/vmlinuz-lts dist/vmlinuz-lts
-      - apk add --initramfs-diskless-boot --no-scripts squashfs-tools linux-lts
-      - mksquashfs alpine-lts/ /media/sysroot.squashfs -comp gzip -b 1M -no-xattrs -always-use-fragments -noappend -no-recovery -processors 1 -mem 1024M -no-progress -wildcards -ef exclude.txt
-      - ./mkinitrd.sh
-    depends_on: ['build image lts']
+      - apk add make squashfs-tools
+      - make lts
 
   - name: clean
     image: alpine
     commands:
-      - rm -Rf alpine-custom/*.pub
-      - rm -Rf alpine-custom/*.apk
-      - rm -Rf alpine-virt
-      - rm -Rf alpine-lts
-      - rm -Rf remco.zip
+      - apk add make
+      - make clean
     depends_on: ['create image lts', 'create image virt']
 
   - name: publish
