@@ -34,7 +34,7 @@ pkgs += wireless-tools wpa_supplicant hostapd
 pkgs += dropbear dropbear-scp dropbear-openrc
 
 # utils
-pkgs += device-mapper-libs dropbear-ssh docker-py supervisor sudo pv minicom unzip tmux mailx
+pkgs += device-mapper-libs dropbear-ssh docker-py supervisor sudo pv minicom unzip tmux mailx tar
 
 # diagnostic
 pkgs += htop atop iftop mtr iperf3 tcpdump usbutils dmidecode lm-sensors
