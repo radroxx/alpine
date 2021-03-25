@@ -31,10 +31,10 @@ pkgs += dhclient ip6tables ipset curl rsync wireguard-tools-wg openvpn lsyncd
 pkgs += wireless-tools wpa_supplicant hostapd
 
 # SSH
-pkgs += dropbear dropbear-scp dropbear-openrc
+pkgs += dropbear dropbear-openrc openssh-client
 
 # utils
-pkgs += device-mapper-libs dropbear-ssh docker-py supervisor sudo pv minicom unzip tmux mailx tar
+pkgs += device-mapper-libs ansible-base docker-py supervisor sudo pv minicom unzip tmux mailx tar
 
 # diagnostic
 pkgs += htop atop iftop mtr iperf3 tcpdump usbutils dmidecode lm-sensors
