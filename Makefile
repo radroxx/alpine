@@ -112,6 +112,7 @@ alpine-%/home/admin/.ssh/authorized_keys: alpine-%/lib/modules
 
 	chroot alpine-$* /sbin/rc-update add dropbear    default
 	chroot alpine-$* /sbin/rc-update add ntpd        default
+	chroot alpine-$* /sbin/rc-update add crond       default
 	chroot alpine-$* /sbin/rc-update add supervisord default
 
 	chroot alpine-$* /usr/sbin/adduser -D -u 1000 admin
