@@ -18,6 +18,10 @@ steps:
     image: alpine:3.13
     commands:
       - apk add make squashfs-tools
+      - ls -lha /
+      - pwd
+      - ls -lha ./
+      - env
       - make virt
   
   - name: create image lts
