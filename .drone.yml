@@ -13,32 +13,53 @@ trigger:
     - refs/pull/*/head
     - refs/tags/*
 
+volumes:
+- name: cache
+  temp: {}
+
 steps:
   - name: create image virt
     image: alpine
+    volumes:
+      - name: cache
+        path: /build
     commands:
       - apk add make squashfs-tools
-      - make virt
+      - cp init /build
+      - cp Makefile /build
+      - cd /build && make virt
   
   - name: create image lts
     image: alpine
+    volumes:
+      - name: cache
+        path: /build
     commands:
       - apk add make squashfs-tools
-      - make lts
+      - cp init /build
+      - cp Makefile /build
+      - cd /build && make lts
 
   - name: clean
     image: alpine
+    volumes:
+      - name: cache
+        path: /build
     commands:
       - apk add make
-      - make clean
+      - cp Makefile /build
+      - cd /build && make clean
     depends_on: ['create image lts', 'create image virt']
 
   - name: publish
     image: plugins/github-release
+    volumes:
+      - name: cache
+        path: /build
     settings:
       api_key:
         from_secret: github_token
-      files: dist/*
+      files: /build/dist/*
       checksum:
         - md5
         - sha1
