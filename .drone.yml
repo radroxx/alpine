@@ -15,7 +15,7 @@ trigger:
 
 steps:
   - name: create image virt
-    image: alpine:3.13
+    image: alpine:3.14
     commands:
       - apk add make squashfs-tools
       - ls -lha /
