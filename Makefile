@@ -44,6 +44,9 @@ virt: dist/initrd-virt dist/vmlinuz-virt
 lts: dist/initrd-lts dist/vmlinuz-lts
 
 dist tmp:
+	pwd
+	ls -lha ./
+	env
 	@mkdir -p $@
 
 tmp/apk-tool.tgz: tmp
