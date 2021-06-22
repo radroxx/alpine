@@ -15,19 +15,19 @@ trigger:
 
 steps:
   - name: create image virt
-    image: alpine
+    image: alpine:3.14
     commands:
       - apk add make squashfs-tools
       - make virt
   
   - name: create image lts
-    image: alpine
+    image: alpine:3.14
     commands:
       - apk add make squashfs-tools
       - make lts
 
   - name: clean
-    image: alpine
+    image: alpine:3.14
     commands:
       - apk add make
       - make clean
