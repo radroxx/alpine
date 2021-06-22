@@ -18,6 +18,7 @@ steps:
     image: alpine:3.14
     commands:
       - apk add make
+      - ls -lha ./
       - make clean-dist
       - make clean
       - ls -lha ./
@@ -32,7 +33,7 @@ steps:
     depends_on: ['clean pre build']
   
   - name: create image lts
-    image: alpine:3.13
+    image: alpine:3.14
     commands:
       - apk add make squashfs-tools
       - make lts
