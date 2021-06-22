@@ -16,6 +16,7 @@ trigger:
 steps:
   - name: clean pre build
     image: alpine:3.14
+    user: root
     commands:
       - apk add make
       - ls -lha ./
