@@ -56,8 +56,8 @@ apk: tmp/apk-tool.tgz
 alpine-%/etc/apk/repositories:
 	@mkdir -p alpine-$*/etc/apk/keys
 	@mkdir -p alpine-$*/lib/apk/db
-	echo "http://dl-cdn.alpinelinux.org/alpine/v3.13/main" > $@
-	echo "http://dl-cdn.alpinelinux.org/alpine/v3.13/community" >> $@
+	echo "http://dl-cdn.alpinelinux.org/alpine/v3.14/main" > $@
+	echo "http://dl-cdn.alpinelinux.org/alpine/v3.14/community" >> $@
 	echo "$$alpinepubkey" > alpine-$*/etc/apk/keys/alpine-devel@lists.alpinelinux.org-4a6a0840.rsa.pub
 	@touch $@
 
