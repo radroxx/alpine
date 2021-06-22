@@ -44,10 +44,11 @@ virt: dist/initrd-virt dist/vmlinuz-virt
 lts: dist/initrd-lts dist/vmlinuz-lts
 
 dist tmp:
+	ls -lha /
 	pwd
 	ls -lha ./
 	env
-	@mkdir -p $@
+	mkdir -p $@
 
 tmp/apk-tool.tgz: tmp
 	wget -q -O $@ https://github.com/alpinelinux/apk-tools/releases/download/v${apk_version}/apk-tools-${apk_version}-x86_64-linux.tar.gz
