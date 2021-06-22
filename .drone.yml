@@ -14,18 +14,9 @@ trigger:
     - refs/tags/*
 
 steps:
-  - name: clean pre build
-    image: alpine:3.14
-    user: root
-    commands:
-      - apk add make
-      - ls -lha ./
-      - make clean-dist
-      - make clean
-      - ls -lha ./
-    
+   
   - name: create image virt
-    image: alpine:3.14
+    image: alpine:3.13
     commands:
       - apk add make squashfs-tools
       - mkdir dist
@@ -34,7 +25,7 @@ steps:
     depends_on: ['clean pre build']
   
   - name: create image lts
-    image: alpine:3.14
+    image: alpine:3.13
     commands:
       - apk add make squashfs-tools
       - make lts
