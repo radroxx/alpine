@@ -25,19 +25,26 @@ pkgs  = alpine-base
 pkgs += btrfs-progs e2fsprogs cryptsetup cryptsetup-openrc cifs-utils ntfs-3g nfs-utils
 
 # Сетевая подсистема
-pkgs += dhclient ip6tables ipset curl rsync wireguard-tools-wg openvpn lsyncd
+pkgs += dhclient nftables nftlb nftables-openrc curl rsync wireguard-tools-wg openvpn lsyncd strongswan strongswan-openrc openvswitch
 
 # Wifi
 pkgs += wireless-tools wpa_supplicant hostapd
 
-# SSH
-pkgs += dropbear dropbear-openrc openssh-client
+# SSH and ssl
+pkgs += dropbear dropbear-openrc openssh-client gnupg openssl
 
 # utils
-pkgs += device-mapper-libs git ansible-base docker-py supervisor sudo pv minicom unzip tmux mailx tar
+pkgs += device-mapper-libs sudo pv minicom unzip tmux mailx tar
+pkgs += git ansible-base docker-py supervisor
+pkgs += fail2ban mqtt-exec mqtt-exec mqtt-exec-openrc logrotate
+pkgs += samba-server tinyproxy
+#pkgs += dovecot
+pkgs += openldap openldap-clients exim mosquitto
+pkgs += nginx nginx-mod-http-dav-ext nginx-mod-http-vts nginx-mod-mail nginx-mod-stream nginx-mod-http-js
 
 # diagnostic
 pkgs += htop atop iftop mtr iperf3 tcpdump usbutils dmidecode lm-sensors
+pkgs += collectd
 
 all: virt lts
 virt: dist/initrd-virt dist/vmlinuz-virt
@@ -64,7 +71,8 @@ alpine-%/etc/apk/repositories:
 alpine-%/etc/issue: apk alpine-%/etc/apk/repositories
 	./apk add --root alpine-$* --initdb --initramfs-diskless-boot --update --verbose --no-cache alpine-keys
 	./apk add --root alpine-$* --initramfs-diskless-boot --update --verbose --no-cache $(pkgs)
-	chmod +rw alpine-$*/bin/bbsuid
+	./apk add --root alpine-$* --initramfs-diskless-boot --update --verbose --no-cache -X http://dl-cdn.alpinelinux.org/alpine/edge/testing proot shadowsocks-libev
+	#chmod +rw alpine-$*/bin/bbsuid
 
 alpine-%/boot/vmlinuz-%: alpine-%/etc/issue
 	./apk add --root alpine-$* --initramfs-diskless-boot --update --verbose --no-cache --no-scripts linux-$*
@@ -84,6 +92,8 @@ alpine-%/home/admin/.ssh/authorized_keys: alpine-%/lib/modules
 
 	#chroot alpine-$* /usr/sbin/addgroup -S docker
 
+	printf "auto lo\niface lo inet loopback\n\nauto eth0\niface eth0 inet dhcp\niface eth0 inet6 auto\n" > alpine-$*/etc/network/interfaces
+
 	chroot alpine-$* /sbin/rc-update add sysfs       sysinit
 	chroot alpine-$* /sbin/rc-update add devfs       sysinit
 	chroot alpine-$* /sbin/rc-update add mdev        sysinit
@@ -101,9 +111,7 @@ alpine-%/home/admin/.ssh/authorized_keys: alpine-%/lib/modules
 	chroot alpine-$* /sbin/rc-update add localmount  boot
 	chroot alpine-$* /sbin/rc-update add bootmisc    boot
 	chroot alpine-$* /sbin/rc-update add loopback    boot
-	chroot alpine-$* /sbin/rc-update add iptables    boot
-	chroot alpine-$* /sbin/rc-update add ip6tables   boot
-	chroot alpine-$* /sbin/rc-update add ipset       boot
+	chroot alpine-$* /sbin/rc-update add nftables    boot
 	chroot alpine-$* /sbin/rc-update add networking  boot
 
 	chroot alpine-$* /sbin/rc-update add mount-ro    shutdown
@@ -126,7 +134,7 @@ alpine-%/home/admin/.ssh/authorized_keys: alpine-%/lib/modules
 	chown 1000:1000 -R alpine-$*/home/admin
 
 alpine-%/media/sysroot.squashfs: alpine-%/home/admin/.ssh/authorized_keys
-	mksquashfs alpine-$*/ alpine-$*/media/sysroot.squashfs -comp gzip -b 1M -no-xattrs -always-use-fragments -noappend \
+	mksquashfs alpine-$*/ alpine-$*/media/sysroot.squashfs -comp xz -b 1M -no-xattrs -always-use-fragments -noappend \
 	-no-recovery -processors 1 -mem 1024M -no-progress -wildcards \
 	-e boot -e dev -e proc -e run -e sys -e tmp -e srv -e opt -e var \
 	-e init -e "media/*" -e "usr/bin/tcpdump.*" -e usr/bin/ctr
