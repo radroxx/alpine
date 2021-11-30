@@ -3,19 +3,44 @@ SHELL := /bin/sh
 .PHONY: all
 .ONESHELL:
 
-define alpinepubkey
+define alpinepubkey1
 -----BEGIN PUBLIC KEY-----
-MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA1yHJxQgsHQREclQu4Ohe
-qxTxd1tHcNnvnQTu/UrTky8wWvgXT+jpveroeWWnzmsYlDI93eLI2ORakxb3gA2O
-Q0Ry4ws8vhaxLQGC74uQR5+/yYrLuTKydFzuPaS1dK19qJPXB8GMdmFOijnXX4SA
-jixuHLe1WW7kZVtjL7nufvpXkWBGjsfrvskdNA/5MfxAeBbqPgaq0QMEfxMAn6/R
-L5kNepi/Vr4S39Xvf2DzWkTLEK8pcnjNkt9/aafhWqFVW7m3HCAII6h/qlQNQKSo
-GuH34Q8GsFG30izUENV9avY7hSLq7nggsvknlNBZtFUcmGoQrtx3FmyYsIC8/R+B
-ywIDAQAB
+MIICIjANBgkqhkiG9w0BAQEFAAOCAg8AMIICCgKCAgEAlEyxkHggKCXC2Wf5Mzx4
+nZLFZvU2bgcA3exfNPO/g1YunKfQY+Jg4fr6tJUUTZ3XZUrhmLNWvpvSwDS19ZmC
+IXOu0+V94aNgnhMsk9rr59I8qcbsQGIBoHzuAl8NzZCgdbEXkiY90w1skUw8J57z
+qCsMBydAueMXuWqF5nGtYbi5vHwK42PffpiZ7G5Kjwn8nYMW5IZdL6ZnMEVJUWC9
+I4waeKg0yskczYDmZUEAtrn3laX9677ToCpiKrvmZYjlGl0BaGp3cxggP2xaDbUq
+qfFxWNgvUAb3pXD09JM6Mt6HSIJaFc9vQbrKB9KT515y763j5CC2KUsilszKi3mB
+HYe5PoebdjS7D1Oh+tRqfegU2IImzSwW3iwA7PJvefFuc/kNIijfS/gH/cAqAK6z
+bhdOtE/zc7TtqW2Wn5Y03jIZdtm12CxSxwgtCF1NPyEWyIxAQUX9ACb3M0FAZ61n
+fpPrvwTaIIxxZ01L3IzPLpbc44x/DhJIEU+iDt6IMTrHOphD9MCG4631eIdB0H1b
+6zbNX1CXTsafqHRFV9XmYYIeOMggmd90s3xIbEujA6HKNP/gwzO6CDJ+nHFDEqoF
+SkxRdTkEqjTjVKieURW7Swv7zpfu5PrsrrkyGnsRrBJJzXlm2FOOxnbI2iSL1B5F
+rO5kbUxFeZUIDq+7Yv4kLWcCAwEAAQ==
 -----END PUBLIC KEY-----
 endef
-export alpinepubkey
+export alpinepubkey1
 
+define alpinepubkey2
+-----BEGIN PUBLIC KEY-----
+MIICIjANBgkqhkiG9w0BAQEFAAOCAg8AMIICCgKCAgEAutQkua2CAig4VFSJ7v54
+ALyu/J1WB3oni7qwCZD3veURw7HxpNAj9hR+S5N/pNeZgubQvJWyaPuQDm7PTs1+
+tFGiYNfAsiibX6Rv0wci3M+z2XEVAeR9Vzg6v4qoofDyoTbovn2LztaNEjTkB+oK
+tlvpNhg1zhou0jDVYFniEXvzjckxswHVb8cT0OMTKHALyLPrPOJzVtM9C1ew2Nnc
+3848xLiApMu3NBk0JqfcS3Bo5Y2b1FRVBvdt+2gFoKZix1MnZdAEZ8xQzL/a0YS5
+Hd0wj5+EEKHfOd3A75uPa/WQmA+o0cBFfrzm69QDcSJSwGpzWrD1ScH3AK8nWvoj
+v7e9gukK/9yl1b4fQQ00vttwJPSgm9EnfPHLAtgXkRloI27H6/PuLoNvSAMQwuCD
+hQRlyGLPBETKkHeodfLoULjhDi1K2gKJTMhtbnUcAA7nEphkMhPWkBpgFdrH+5z4
+Lxy+3ek0cqcI7K68EtrffU8jtUj9LFTUC8dERaIBs7NgQ/LfDbDfGh9g6qVj1hZl
+k9aaIPTm/xsi8v3u+0qaq7KzIBc9s59JOoA8TlpOaYdVgSQhHHLBaahOuAigH+VI
+isbC9vmqsThF2QdDtQt37keuqoda2E6sL7PUvIyVXDRfwX7uMDjlzTxHTymvq2Ck
+htBqojBnThmjJQFgZXocHG8CAwEAAQ==
+-----END PUBLIC KEY-----
+endef
+export alpinepubkey2
+
+
+alpine = 3.15
 apk_version = 2.10.4
 
 # Базовая система
@@ -35,16 +60,18 @@ pkgs += dropbear dropbear-openrc openssh-client gnupg openssl
 
 # utils
 pkgs += device-mapper-libs sudo pv minicom unzip tmux mailx tar
-pkgs += git ansible-base docker-py supervisor
-pkgs += fail2ban mqtt-exec mqtt-exec mqtt-exec-openrc logrotate
-pkgs += samba-server tinyproxy
+pkgs += git ansible-base supervisor bind-tools
+pkgs += fail2ban mqtt-exec mqtt-exec-openrc logrotate
+pkgs += openldap openldap-clients samba-server tinyproxy
 #pkgs += dovecot
-pkgs += openldap openldap-clients exim mosquitto
+pkgs += exim imap ngircd
 pkgs += nginx nginx-mod-http-dav-ext nginx-mod-http-vts nginx-mod-mail nginx-mod-stream nginx-mod-http-js
 
 # diagnostic
 pkgs += htop atop iftop mtr iperf3 tcpdump usbutils dmidecode lm-sensors
-pkgs += collectd
+pkgs += collectd collectd-disk collectd-dns collectd-python collectd-wireless collectd-statsd collectd-snmp collectd-sensors collectd-smart collectd-apcups
+pkgs += collectd-postgresql collectd-ping collectd-nginx collectd-network collectd-hddtemp collectd-openvpn collectd-openldap collectd-ovs collectd-rrdtool
+pkgs += collectd-pcie_errors collectd-sysevent 
 
 all: virt lts
 virt: dist/initrd-virt dist/vmlinuz-virt
@@ -63,9 +90,10 @@ apk: tmp/apk-tool.tgz
 alpine-%/etc/apk/repositories:
 	@mkdir -p alpine-$*/etc/apk/keys
 	@mkdir -p alpine-$*/lib/apk/db
-	echo "http://dl-cdn.alpinelinux.org/alpine/v3.14/main" > $@
-	echo "http://dl-cdn.alpinelinux.org/alpine/v3.14/community" >> $@
-	echo "$$alpinepubkey" > alpine-$*/etc/apk/keys/alpine-devel@lists.alpinelinux.org-4a6a0840.rsa.pub
+	echo "http://dl-cdn.alpinelinux.org/alpine/v${alpine}/main" > $@
+	echo "http://dl-cdn.alpinelinux.org/alpine/v${alpine}/community" >> $@
+	echo "$$alpinepubkey1" > alpine-$*/etc/apk/keys/alpine-devel@lists.alpinelinux.org-61666e3f.rsa.pub
+	echo "$$alpinepubkey2" > alpine-$*/etc/apk/keys/alpine-devel@lists.alpinelinux.org-6165ee59.rsa.pub
 	@touch $@
 
 alpine-%/etc/issue: apk alpine-%/etc/apk/repositories
@@ -123,7 +151,10 @@ alpine-%/home/admin/.ssh/authorized_keys: alpine-%/lib/modules
 	chroot alpine-$* /sbin/rc-update add crond       default
 	chroot alpine-$* /sbin/rc-update add supervisord default
 
+	chroot alpine-$* /bin/sed -i 's/1000/998/g' /etc/passwd
+	chroot alpine-$* /bin/sed -i 's/1000/998/g' /etc/group
 	chroot alpine-$* /usr/sbin/adduser -D -u 1000 admin
+	chroot alpine-$* /usr/sbin/addgroup -g 1000 admin
 	chroot alpine-$* /usr/sbin/addgroup admin wheel
 
 	echo 'root:toor' | chroot alpine-$* /usr/sbin/chpasswd
@@ -164,14 +195,14 @@ dist/initrd-%: dist/vmlinuz-% alpine-%/media/sysroot.squashfs
 		lib/modules/$(shell ls -1 alpine-$*/lib/modules/ | head -n1 | tr -d "\r\n")/kernel
 		lib/modules/$(shell ls -1 alpine-$*/lib/modules/ | head -n1 | tr -d "\r\n")/kernel/drivers/
 		lib/modules/$(shell ls -1 alpine-$*/lib/modules/ | head -n1 | tr -d "\r\n")/kernel/drivers/block
-		lib/modules/$(shell ls -1 alpine-$*/lib/modules/ | head -n1 | tr -d "\r\n")/kernel/drivers/block/loop.ko
+		lib/modules/$(shell ls -1 alpine-$*/lib/modules/ | head -n1 | tr -d "\r\n")/kernel/drivers/block/loop.ko.gz
 
 		# squashfs
 		lib/modules/$(shell ls -1 alpine-$*/lib/modules/ | head -n1 | tr -d "\r\n")/kernel/fs
 		lib/modules/$(shell ls -1 alpine-$*/lib/modules/ | head -n1 | tr -d "\r\n")/kernel/fs/overlayfs
-		lib/modules/$(shell ls -1 alpine-$*/lib/modules/ | head -n1 | tr -d "\r\n")/kernel/fs/overlayfs/overlay.ko
+		lib/modules/$(shell ls -1 alpine-$*/lib/modules/ | head -n1 | tr -d "\r\n")/kernel/fs/overlayfs/overlay.ko.gz
 		lib/modules/$(shell ls -1 alpine-$*/lib/modules/ | head -n1 | tr -d "\r\n")/kernel/fs/squashfs
-		lib/modules/$(shell ls -1 alpine-$*/lib/modules/ | head -n1 | tr -d "\r\n")/kernel/fs/squashfs/squashfs.ko
+		lib/modules/$(shell ls -1 alpine-$*/lib/modules/ | head -n1 | tr -d "\r\n")/kernel/fs/squashfs/squashfs.ko.gz
 
 		media
 		media/sysroot.squashfs
