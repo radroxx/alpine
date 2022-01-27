@@ -60,15 +60,15 @@ pkgs += dropbear dropbear-openrc openssh-client gnupg openssl
 
 # utils
 pkgs += device-mapper-libs sudo pv minicom unzip tmux mailx tar
-pkgs += git ansible-base supervisor bind-tools
-pkgs += fail2ban mqtt-exec mqtt-exec-openrc logrotate
+pkgs += git ansible-core supervisor bind-tools
+pkgs += fail2ban mqtt-exec logrotate
 pkgs += openldap openldap-clients samba-server tinyproxy
 #pkgs += dovecot
 pkgs += exim imap ngircd
 pkgs += nginx nginx-mod-http-dav-ext nginx-mod-http-vts nginx-mod-mail nginx-mod-stream nginx-mod-http-js
 
 # diagnostic
-pkgs += htop atop iftop mtr iperf3 tcpdump usbutils dmidecode lm-sensors
+pkgs += neofetch htop atop iftop mtr iperf3 tcpdump usbutils dmidecode lm-sensors
 pkgs += collectd collectd-disk collectd-dns collectd-python collectd-wireless collectd-statsd collectd-snmp collectd-sensors collectd-smart collectd-apcups
 pkgs += collectd-postgresql collectd-ping collectd-nginx collectd-network collectd-hddtemp collectd-openvpn collectd-openldap collectd-ovs collectd-rrdtool
 pkgs += collectd-pcie_errors collectd-sysevent 
@@ -100,6 +100,9 @@ alpine-%/etc/issue: apk alpine-%/etc/apk/repositories
 	./apk add --root alpine-$* --initdb --initramfs-diskless-boot --update --verbose --no-cache alpine-keys
 	./apk add --root alpine-$* --initramfs-diskless-boot --update --verbose --no-cache $(pkgs)
 	./apk add --root alpine-$* --initramfs-diskless-boot --update --verbose --no-cache -X http://dl-cdn.alpinelinux.org/alpine/edge/testing proot shadowsocks-libev
+	wget -O alpine-$*/usr/lib/python3.9/site-packages/ansible/plugins/filter/encryption.py https://raw.githubusercontent.com/ansible/ansible/v2.12.0/lib/ansible/plugins/filter/encryption.py
+	wget -O - https://github.com/shadowsocks/v2ray-plugin/releases/download/v1.3.1/v2ray-plugin-linux-amd64-v1.3.1.tar.gz | tar -zxO > alpine-$*/usr/bin/v2ray-plugin
+	chmod +x alpine-$*/usr/bin/v2ray-plugin
 	#chmod +rw alpine-$*/bin/bbsuid
 
 alpine-%/boot/vmlinuz-%: alpine-%/etc/issue
