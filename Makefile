@@ -42,15 +42,19 @@ export alpinepubkey2
 
 alpine = 3.15
 apk_version = 2.10.4
+#arch = x86_64
+arch = x86
 
 # Базовая система
 pkgs  = alpine-base
 
 # Файловая подсистема
-pkgs += btrfs-progs e2fsprogs cryptsetup cryptsetup-openrc cifs-utils ntfs-3g nfs-utils
+pkgs += btrfs-progs e2fsprogs cryptsetup cryptsetup-openrc
+pkgs += cifs-utils ntfs-3g nfs-utils
 
 # Сетевая подсистема
-pkgs += dhclient nftables nftlb nftables-openrc curl rsync wireguard-tools-wg openvpn lsyncd strongswan strongswan-openrc openvswitch
+pkgs += dhclient nftables nftlb nftables-openrc curl rsync wireguard-tools-wg openvpn
+pkgs += lsyncd strongswan strongswan-openrc openvswitch
 
 # Wifi
 pkgs += wireless-tools wpa_supplicant hostapd
@@ -61,11 +65,16 @@ pkgs += dropbear dropbear-openrc openssh-client gnupg openssl
 # utils
 pkgs += device-mapper-libs sudo pv minicom unzip tmux mailx tar
 pkgs += git ansible-core supervisor bind-tools
-pkgs += fail2ban mqtt-exec logrotate
-pkgs += openldap openldap-clients samba-server tinyproxy
-#pkgs += dovecot
+pkgs += fail2ban logrotate
+pkgs += mqtt-exec
+pkgs += samba-server
+pkgs += openldap openldap-clients tinyproxy
+##pkgs += dovecot
 pkgs += exim imap ngircd
-pkgs += nginx nginx-mod-http-dav-ext nginx-mod-http-vts nginx-mod-mail nginx-mod-stream nginx-mod-http-js
+pkgs += nginx nginx-mod-http-dav-ext nginx-mod-http-vts nginx-mod-mail nginx-mod-stream
+
+# x86_64 only
+pkgs += nginx-mod-http-js
 
 # diagnostic
 pkgs += neofetch htop atop iftop mtr iperf3 tcpdump usbutils dmidecode lm-sensors
@@ -97,16 +106,17 @@ alpine-%/etc/apk/repositories:
 	@touch $@
 
 alpine-%/etc/issue: apk alpine-%/etc/apk/repositories
-	./apk add --root alpine-$* --initdb --initramfs-diskless-boot --update --verbose --no-cache alpine-keys
-	./apk add --root alpine-$* --initramfs-diskless-boot --update --verbose --no-cache $(pkgs)
-	./apk add --root alpine-$* --initramfs-diskless-boot --update --verbose --no-cache -X http://dl-cdn.alpinelinux.org/alpine/edge/testing proot shadowsocks-libev
+	./apk add --root alpine-$* --initdb --initramfs-diskless-boot --update --verbose --no-cache --arch $(arch) alpine-keys
+	./apk add --root alpine-$* --initramfs-diskless-boot --update --verbose --no-cache --arch $(arch) $(pkgs)
+	./apk add --root alpine-$* --initramfs-diskless-boot --update --verbose --no-cache --arch $(arch) -X http://dl-cdn.alpinelinux.org/alpine/edge/testing proot shadowsocks-libev
 	wget -O alpine-$*/usr/lib/python3.9/site-packages/ansible/plugins/filter/encryption.py https://raw.githubusercontent.com/ansible/ansible/v2.12.0/lib/ansible/plugins/filter/encryption.py
 	wget -O - https://github.com/shadowsocks/v2ray-plugin/releases/download/v1.3.1/v2ray-plugin-linux-amd64-v1.3.1.tar.gz | tar -zxO > alpine-$*/usr/bin/v2ray-plugin
+	#wget -O - https://github.com/shadowsocks/v2ray-plugin/releases/download/v1.3.1/v2ray-plugin-linux-386-v1.3.1.tar.gz | tar -zxO > alpine-$*/usr/bin/v2ray-plugin
 	chmod +x alpine-$*/usr/bin/v2ray-plugin
 	#chmod +rw alpine-$*/bin/bbsuid
 
 alpine-%/boot/vmlinuz-%: alpine-%/etc/issue
-	./apk add --root alpine-$* --initramfs-diskless-boot --update --verbose --no-cache --no-scripts linux-$*
+	./apk add --root alpine-$* --initramfs-diskless-boot --update --verbose --no-cache --no-scripts --arch $(arch) linux-$*
 
 alpine-%/lib/modules: alpine-%/boot/vmlinuz-%
 	@ln -s $(shell ls -1 alpine-$*/lib/modules/ | head -n1 | tr -d "\r\n") alpine-$*/lib/modules/$(shell uname -r)
@@ -156,7 +166,7 @@ alpine-%/home/admin/.ssh/authorized_keys: alpine-%/lib/modules
 
 	chroot alpine-$* /bin/sed -i 's/1000/998/g' /etc/passwd
 	chroot alpine-$* /bin/sed -i 's/1000/998/g' /etc/group
-	chroot alpine-$* /usr/sbin/adduser -D -u 1000 admin
+	chroot alpine-$* /usr/sbin/adduser -D -u 1000 -s /bin/ash admin
 	chroot alpine-$* /usr/sbin/addgroup -g 1000 admin
 	chroot alpine-$* /usr/sbin/addgroup admin wheel
 
@@ -166,6 +176,9 @@ alpine-%/home/admin/.ssh/authorized_keys: alpine-%/lib/modules
 	mkdir -p alpine-$*/home/admin/.ssh
 	touch $@
 	chown 1000:1000 -R alpine-$*/home/admin
+	#rm -Rf alpine-$*/lib/firmware/amdgpu
+	#rm -Rf alpine-$*/lib/firmware/qed
+	#rm -Rf alpine-$*/lib/firmware/mellanox
 
 alpine-%/media/sysroot.squashfs: alpine-%/home/admin/.ssh/authorized_keys
 	mksquashfs alpine-$*/ alpine-$*/media/sysroot.squashfs -comp xz -b 1M -no-xattrs -always-use-fragments -noappend \
@@ -190,6 +203,8 @@ dist/initrd-%: dist/vmlinuz-% alpine-%/media/sysroot.squashfs
 		lib
 		lib/ld-musl-x86_64.so.1
 		lib/libc.musl-x86_64.so.1
+		#lib/ld-musl-i386.so.1
+		#lib/libc.musl-x86.so.1
 
 		# loop
 		lib/modules
