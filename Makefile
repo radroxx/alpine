@@ -42,8 +42,8 @@ export alpinepubkey2
 
 alpine = 3.15
 apk_version = 2.10.4
-#arch = x86_64
-arch = x86
+arch = x86_64
+#arch = x86
 
 # Базовая система
 pkgs  = alpine-base
