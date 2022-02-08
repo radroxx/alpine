@@ -39,7 +39,12 @@ echo "echo 'root:${SECRET_PASSWORD}' | chpasswd -e"
 
 ### How to boot in qemu
 ```sh
-qemu-system-x86_64 -m 512M -nographic -append "console=ttyS0" -kernel vmlinuz-virt -initrd my_custom_initrd
+qemu-system-x86_64 -cpu host -enable-kvm -smp 1,cores=1 -m 512M -nographic -append "console=ttyS0" -kernel vmlinuz-virt -initrd my_custom_initrd
+
+qemu-system-x86_64 -cpu host -enable-kvm -smp 1,cores=1 -net nic,model=virtio -net user,hostfwd=tcp::2222-:22 -m 512M -nographic -append "console=ttyS0" -kernel vmlinuz-virt -initrd my_custom_initrd
+
+qemu-system-x86_64 -cpu host -enable-kvm -smp 1,cores=1 -net nic,model=virtio -net user,hostfwd=tcp::8222-:8222 -m 512M -nographic -hda disk.img -append console=ttyS0 -kernel vmlinuz-virt -initrd my_custom_initrd
+
 ```
 ### How to exit from qemu
 ```sh
