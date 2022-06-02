@@ -40,7 +40,7 @@ endef
 export alpinepubkey2
 
 
-alpine = 3.15
+alpine = 3.16
 apk_version = 2.10.4
 arch = x86_64
 #arch = x86
