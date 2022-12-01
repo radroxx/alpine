@@ -40,7 +40,7 @@ endef
 export alpinepubkey2
 
 
-alpine = 3.16
+alpine = 3.17
 apk_version = 2.10.4
 arch = x86_64
 #arch = x86
@@ -54,7 +54,7 @@ pkgs += cifs-utils ntfs-3g nfs-utils
 
 # Сетевая подсистема
 pkgs += dhclient nftables nftlb nftables-openrc curl rsync wireguard-tools-wg openvpn
-pkgs += lsyncd strongswan strongswan-openrc openvswitch
+pkgs += lsyncd strongswan strongswan-openrc openvswitch dnsmasq
 
 # Wifi
 pkgs += wireless-tools wpa_supplicant hostapd
