@@ -88,24 +88,6 @@ rc-update add zfs-mount default
 # Enable find all pools
 sed -i "s/ZPOOL_IMPORT_ALL_VISIBLE=.*/ZPOOL_IMPORT_ALL_VISIBLE='yes'/g" /etc/conf.d/zfs
 
-# Config nft
-cat<<EOF > /etc/nftables.nft
-flush ruleset
-table inet filter {
-	chain input {
-		type filter hook input priority filter; policy accept;
-	}
-
-	chain forward {
-		type filter hook forward priority filter; policy drop;
-	}
-
-	chain output {
-		type filter hook output priority filter; policy accept;
-	}
-}
-EOF
-
 # Config samba
 mkdir -p /var/log/samba/
 mkdir -p /var/lib/samba/private
