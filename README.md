@@ -201,6 +201,8 @@ sudo zfs create \
   -o atime=off \
   data/share
 
+chown admin:admin -R /data/share
+
 sudo poweroff
 ```
 
